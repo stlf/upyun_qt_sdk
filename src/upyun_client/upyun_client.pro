@@ -13,10 +13,12 @@ TEMPLATE = lib
 
 DEFINES += UPYUN_CLIENT_LIBRARY
 
-SOURCES += upyun_client.cpp
+SOURCES += upyun_client.cpp \
+    upyun_client_impl.cpp
 
 HEADERS += upyun_client.h\
-        upyun_client_global.h
+        upyun_client_global.h \
+    upyun_client_impl.h
 
 unix {
     target.path = /usr/lib

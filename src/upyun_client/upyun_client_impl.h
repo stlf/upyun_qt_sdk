@@ -7,7 +7,7 @@ class upyun_client_impl : public QObject
 {
     Q_OBJECT
 public:
-    explicit upyun_client_impl(QObject *parent = 0);
+    explicit upyun_client_impl(const QString &usr, const QString &pass, QObject *parent = 0);
 
 signals:
 
