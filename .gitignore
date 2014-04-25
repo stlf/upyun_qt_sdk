@@ -213,3 +213,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile
+build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile.Debug
+build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile.Release
