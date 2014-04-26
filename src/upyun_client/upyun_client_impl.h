@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 class QNetworkReply;
 class upyun_client_impl : public QObject
@@ -22,6 +23,8 @@ signals:
 public slots:
     QNetworkReply *uploadFile(const QString &local_path, const QString &remote_path);
     QNetworkReply *downloadFile(const QString &remote_path);
+    void _error(QNetworkReply::NetworkError);
+
 
 private:
     QString _usr;

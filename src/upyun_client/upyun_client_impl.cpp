@@ -74,19 +74,35 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
     request.setRawHeader("Date", now_time.toLatin1());
     request.setRawHeader("mkdir","true");
 
-    QNetworkReply *reply = _qnam.put(request, file_data);
+    _reply = _qnam.put(request, file_data);
 
-    QObject::connect(reply, SIGNAL(finished()), this, SIGNAL(finished()));
+    connect(_reply, &QNetworkReply::finished, [this](){finished();});
 
-    // QObject::connect(reply, SIGNAL(error(QNetworkReply::NetworkError))()), this, SIGNAL(finished()));
-    // TODO: connect error handle
+    /*
+     *   // in vs2012, use lambda express can not compile function with nest type parameter, :(
+     *   connect(reply, &QNetworkReply::error, [=]( QNetworkReply::NetworkError code ){
+     *
+     *   });
+     */
+    connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)),
+            this, SLOT(_error(QNetworkReply::NetworkError)));
 
-    return reply;
+    connect(_reply, &QNetworkReply::uploadProgress, this, &upyun_client_impl::uploadProgress);
+    connect(_reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
 
+
+    return _reply;
 
 }
+
+void upyun_client_impl::_error(QNetworkReply::NetworkError)
+{
+    error(_reply->errorString());
+}
+
 
 QNetworkReply* upyun_client_impl::downloadFile(const QString &path)
 {
     return NULL;
 }
+

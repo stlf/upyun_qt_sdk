@@ -24,3 +24,6 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+OTHER_FILES += \
+    bar-descriptor.xml
