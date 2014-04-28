@@ -59,6 +59,7 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
     }
 
     const QByteArray &file_data = file.readAll();
+
     QString content_len = QString::number(file_data.length());
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -104,6 +105,20 @@ void upyun_client_impl::_error(QNetworkReply::NetworkError)
 
 QNetworkReply* upyun_client_impl::downloadFile(const QString &path)
 {
+    QString content_len = 0;
+    QString path_url =  "/" + _bucket + "/" + path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+
+    QString auth = get_auth_string(_usr,
+                                   get_sign("GET", path_url, now_time, content_len, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+
+
+
     return NULL;
 }
 
