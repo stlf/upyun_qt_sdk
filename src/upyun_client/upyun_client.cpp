@@ -1,6 +1,6 @@
 #include "upyun_client.h"
 
 
-Upyun_client::Upyun_client()
+upyun_client::upyun_client()
 {
 }
