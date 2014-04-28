@@ -76,7 +76,7 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
 
     _reply = _qnam.put(request, file_data);
 
-    connect(_reply, &QNetworkReply::finished, [this](){finished();});
+    // connect(_reply, &QNetworkReply::finished, [this](){finished();});
 
     /*
      *   // in vs2012, use lambda express can not compile function with nest type parameter, :(
