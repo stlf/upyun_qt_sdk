@@ -89,6 +89,7 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
 
     connect(_reply, &QNetworkReply::uploadProgress, this, &upyun_client_impl::uploadProgress);
     connect(_reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
+    connect(_reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
 
 
     return _reply;
