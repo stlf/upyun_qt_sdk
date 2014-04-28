@@ -41,6 +41,12 @@ QString get_auth_string(const QString &usr, const QString &sign)
     return auth;
 }
 
+QNetworkReplyHelper::QNetworkReplyHelper(QNetworkReply *parent):QObject(parent),_parent(parent)
+{
+    connect(_parent, SIGNAL(error), this, SLOT(_error));
+}
+
+
 upyun_client_impl::upyun_client_impl(const QString &usr, const QString &pass, const QString &bucket,
                                      QObject *parent) :
     _usr(usr), _pwd(pass), _bucket(bucket), QObject(parent)
@@ -75,38 +81,29 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
     request.setRawHeader("Date", now_time.toLatin1());
     request.setRawHeader("mkdir","true");
 
-    _reply = _qnam.put(request, file_data);
-
-    // connect(_reply, &QNetworkReply::finished, [this](){finished();});
-
-    /*
-     *   // in vs2012, use lambda express can not compile function with nest type parameter, :(
-     *   connect(reply, &QNetworkReply::error, [=]( QNetworkReply::NetworkError code ){
-     *
-     *   });
-     */
-    connect(_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-            this, SLOT(_error(QNetworkReply::NetworkError)));
-
-    connect(_reply, &QNetworkReply::uploadProgress, this, &upyun_client_impl::uploadProgress);
-    connect(_reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
-    connect(_reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
+    QNetworkReply *reply = _qnam.put(request, file_data);
 
 
-    return _reply;
+    // in vs2012, use lambda express can not compile function with nest type parameter, :(,
+    // so walk around use QNetworkReplyHelper!
+    //    connect(_reply, &QNetworkReply::error, [=]( QNetworkReply::NetworkError code ){
+    //    });
+
+//    QNetworkReplyHelper *pnh = new QNetworkReplyHelper(reply);
+//    connect(pnh, &QNetworkReplyHelper::error, this, &upyun_client_impl::error);
+
+//    connect(reply, &QNetworkReply::uploadProgress, this, &upyun_client_impl::uploadProgress);
+//    connect(reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
+
+
+    return reply;
 
 }
 
-void upyun_client_impl::_error(QNetworkReply::NetworkError)
-{
-    error(_reply->errorString());
-}
-
-
-QNetworkReply* upyun_client_impl::downloadFile(const QString &path)
+QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path, const QString &local_path)
 {
     QString content_len = 0;
-    QString path_url =  "/" + _bucket + "/" + path;
+    QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
 
     QString auth = get_auth_string(_usr,
@@ -117,8 +114,13 @@ QNetworkReply* upyun_client_impl::downloadFile(const QString &path)
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", auth.toLatin1());
 
+    QNetworkReply *reply = _qnam.get(request);
 
+//    QNetworkReplyHelper *pnh = new QNetworkReplyHelper(reply);
+//    connect(pnh, &QNetworkReplyHelper::error, this, &upyun_client_impl::error);
+//    connect(reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
+//    connect(reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
 
-    return NULL;
+    return reply;
 }
 
