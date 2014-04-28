@@ -41,10 +41,10 @@ QString get_auth_string(const QString &usr, const QString &sign)
     return auth;
 }
 
-QNetworkReplyHelper::QNetworkReplyHelper(QNetworkReply *parent):QObject(parent),_parent(parent)
-{
-    connect(_parent, SIGNAL(error), this, SLOT(_error));
-}
+//QNetworkReplyHelper::QNetworkReplyHelper(QNetworkReply *parent):QObject(parent),_parent(parent)
+//{
+//    connect(_parent, SIGNAL(error), this, SLOT(_error));
+//}
 
 
 upyun_client_impl::upyun_client_impl(const QString &usr, const QString &pass, const QString &bucket,
@@ -100,19 +100,17 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
 
 }
 
-QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path, const QString &local_path)
+QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path)
 {
-    QString content_len = 0;
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
-
     QString auth = get_auth_string(_usr,
-                                   get_sign("GET", path_url, now_time, content_len, _pwd));
-
+                                   get_sign("GET", path_url, now_time, 0, _pwd));
     QUrl url = upyun_api_host + path_url;
 
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
 
     QNetworkReply *reply = _qnam.get(request);
 
@@ -120,6 +118,122 @@ QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path, const
 //    connect(pnh, &QNetworkReplyHelper::error, this, &upyun_client_impl::error);
 //    connect(reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
 //    connect(reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::removeFile(const QString &remote_path)
+{
+    QString path_url =  "/" + _bucket + "/" + remote_path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("DELETE", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+    request.setRawHeader("mkdir","true");
+
+    QNetworkReply *reply = _qnam.deleteResource(request);
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::makeDir(const QString &remote_path)
+{
+    QString path_url =  "/" + _bucket + "/" + remote_path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("POST", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+    request.setRawHeader("Folder", "create");
+
+    QNetworkReply *reply = _qnam.post(request,"");
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::removeDir(const QString &remote_path)
+{
+    QString path_url =  "/" + _bucket + "/" + remote_path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("DELETE", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+
+    QNetworkReply *reply = _qnam.deleteResource(request);
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::listDir(const QString &remote_path)
+{
+    QString path_url =  "/" + _bucket + "/" + remote_path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("GET", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+
+    QNetworkReply *reply = _qnam.get(request);
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::getBucketInfo()
+{
+    QString path_url =  "/" + _bucket + "/?usage";
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("GET", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+
+    QNetworkReply *reply = _qnam.get(request);
+
+    return reply;
+}
+
+QNetworkReply *upyun_client_impl::getFileInfo(const QString &remote_path)
+{
+    QString path_url =  "/" + _bucket + "/" + remote_path;
+    QString now_time =  rfc1123_datetime(time(NULL)).c_str();
+    QString auth = get_auth_string(_usr,
+                                   get_sign("HEAD", path_url, now_time,
+                                            0, _pwd));
+
+    QUrl url = upyun_api_host + path_url;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", auth.toLatin1());
+    request.setRawHeader("Date", now_time.toLatin1());
+
+    QNetworkReply *reply = _qnam.head(request);
 
     return reply;
 }
