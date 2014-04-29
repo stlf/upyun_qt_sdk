@@ -41,20 +41,14 @@ QString get_auth_string(const QString &usr, const QString &sign)
     return auth;
 }
 
-//QNetworkReplyHelper::QNetworkReplyHelper(QNetworkReply *parent):QObject(parent),_parent(parent)
-//{
-//    connect(_parent, SIGNAL(error), this, SLOT(_error));
-//}
-
-
-upyun_client_impl::upyun_client_impl(const QString &usr, const QString &pass, const QString &bucket,
+UpyunClientPrivate::UpyunClientPrivate(const QString &usr, const QString &pass, const QString &bucket,
                                      QObject *parent) :
     _usr(usr), _pwd(pass), _bucket(bucket), QObject(parent)
 {
 
 }
 
-QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
+QNetworkReply* UpyunClientPrivate::uploadFile(const QString &local_path,
                                              const QString &remote_path)
 {
     // read file
@@ -83,24 +77,11 @@ QNetworkReply* upyun_client_impl::uploadFile(const QString &local_path,
 
     QNetworkReply *reply = _qnam.put(request, file_data);
 
-
-    // in vs2012, use lambda express can not compile function with nest type parameter, :(,
-    // so walk around use QNetworkReplyHelper!
-    //    connect(_reply, &QNetworkReply::error, [=]( QNetworkReply::NetworkError code ){
-    //    });
-
-//    QNetworkReplyHelper *pnh = new QNetworkReplyHelper(reply);
-//    connect(pnh, &QNetworkReplyHelper::error, this, &upyun_client_impl::error);
-
-//    connect(reply, &QNetworkReply::uploadProgress, this, &upyun_client_impl::uploadProgress);
-//    connect(reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
-
-
     return reply;
 
 }
 
-QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path)
+QNetworkReply* UpyunClientPrivate::downloadFile(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -114,15 +95,10 @@ QNetworkReply* upyun_client_impl::downloadFile(const QString &remote_path)
 
     QNetworkReply *reply = _qnam.get(request);
 
-//    QNetworkReplyHelper *pnh = new QNetworkReplyHelper(reply);
-//    connect(pnh, &QNetworkReplyHelper::error, this, &upyun_client_impl::error);
-//    connect(reply, &QNetworkReply::downloadProgress, this, &upyun_client_impl::downloadProgress);
-//    connect(reply, &QNetworkReply::finished, this, &upyun_client_impl::finished);
-
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::removeFile(const QString &remote_path)
+QNetworkReply *UpyunClientPrivate::removeFile(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -142,7 +118,7 @@ QNetworkReply *upyun_client_impl::removeFile(const QString &remote_path)
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::makeDir(const QString &remote_path)
+QNetworkReply *UpyunClientPrivate::makeDir(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -162,7 +138,7 @@ QNetworkReply *upyun_client_impl::makeDir(const QString &remote_path)
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::removeDir(const QString &remote_path)
+QNetworkReply *UpyunClientPrivate::removeDir(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -181,7 +157,7 @@ QNetworkReply *upyun_client_impl::removeDir(const QString &remote_path)
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::listDir(const QString &remote_path)
+QNetworkReply *UpyunClientPrivate::listDir(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -200,7 +176,7 @@ QNetworkReply *upyun_client_impl::listDir(const QString &remote_path)
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::getBucketInfo()
+QNetworkReply *UpyunClientPrivate::getBucketInfo()
 {
     QString path_url =  "/" + _bucket + "/?usage";
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
@@ -219,7 +195,7 @@ QNetworkReply *upyun_client_impl::getBucketInfo()
     return reply;
 }
 
-QNetworkReply *upyun_client_impl::getFileInfo(const QString &remote_path)
+QNetworkReply *UpyunClientPrivate::getFileInfo(const QString &remote_path)
 {
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();

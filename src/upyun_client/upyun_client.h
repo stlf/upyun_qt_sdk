@@ -2,9 +2,11 @@
 #define UPYUN_CLIENT_H
 
 #include "upyun_client_global.h"
+#include <QObject>
+#include <QScopedPointer>
 #include <QList>
 
-class upyun_file_info
+class UPYUN_CLIENTSHARED_EXPORT upyun_file_info
 {
 public:
     QString name;
@@ -13,10 +15,12 @@ public:
     QString last_modify_date;
 };
 
-class UPYUN_CLIENTSHARED_EXPORT upyun_client
+class UpyunClientPrivate;
+
+class UPYUN_CLIENTSHARED_EXPORT UpyunClient
 {
 public:
-    upyun_client(const QString &usr, const QString &pass, const QString &bucket);
+    UpyunClient(const QString &usr, const QString &pass, const QString &bucket);
 
     void uploadFile(const QString &local_path, const QString &remote_path);
     QByteArray downloadFile(const QString &remote_path);
@@ -27,6 +31,11 @@ public:
 
     QString getBucketInfo();
     upyun_file_info getFileInfo(const QString &remote_path);
+
+protected:
+    Q_DECLARE_PRIVATE(UpyunClient)
+    QScopedPointer<UpyunClientPrivate> d_ptr;
+
 };
 
 #endif // UPYUN_CLIENT_H

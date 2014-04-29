@@ -5,11 +5,11 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-class upyun_client_impl : public QObject
+class UpyunClientPrivate : public QObject
 {
     Q_OBJECT
 public:
-    explicit upyun_client_impl(const QString &usr, const QString &pass, const QString &bucket,
+    explicit UpyunClientPrivate(const QString &usr, const QString &pass, const QString &bucket,
                                QObject *parent = 0);
 signals:
     void error(const QString &info);
