@@ -15,7 +15,7 @@ signals:
     void error(const QString &info);
 
 public slots:
-    QNetworkReply *uploadFile(const QString &local_path, const QString &remote_path);
+    QNetworkReply *uploadFile(const QByteArray &filedata, const QString &remote_path);
     QNetworkReply *downloadFile(const QString &remote_path);
 
     QNetworkReply *removeFile(const QString &remote_path);

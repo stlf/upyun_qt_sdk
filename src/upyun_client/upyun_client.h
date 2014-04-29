@@ -3,10 +3,9 @@
 
 #include "upyun_client_global.h"
 #include <QObject>
-#include <QScopedPointer>
 #include <QList>
 
-class UPYUN_CLIENTSHARED_EXPORT upyun_file_info
+class /*UPYUN_CLIENTSHARED_EXPORT*/ upyun_file_info
 {
 public:
     QString name;
@@ -17,8 +16,9 @@ public:
 
 class UpyunClientPrivate;
 
-class UPYUN_CLIENTSHARED_EXPORT UpyunClient
+class /*UPYUN_CLIENTSHARED_EXPORT*/ UpyunClient : public QObject
 {
+    Q_OBJECT
 public:
     UpyunClient(const QString &usr, const QString &pass, const QString &bucket);
 
@@ -30,11 +30,11 @@ public:
     QList<upyun_file_info> listDir(const QString &remote_path);
 
     QString getBucketInfo();
-    upyun_file_info getFileInfo(const QString &remote_path);
+    // upyun_file_info getFileInfo(const QString &remote_path);
 
 protected:
     Q_DECLARE_PRIVATE(UpyunClient)
-    QScopedPointer<UpyunClientPrivate> d_ptr;
+    UpyunClientPrivate* d_ptr;
 
 };
 

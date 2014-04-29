@@ -8,7 +8,7 @@
 #include <string>
 #include "upyun_client_impl.h"
 
-const static QString upyun_api_host = "https://v0.api.upyun.com";
+const static QString upyun_api_host = "http://v0.api.upyun.com";
 
 std::string rfc1123_datetime( time_t time )
 {
@@ -48,19 +48,10 @@ UpyunClientPrivate::UpyunClientPrivate(const QString &usr, const QString &pass, 
 
 }
 
-QNetworkReply* UpyunClientPrivate::uploadFile(const QString &local_path,
+QNetworkReply* UpyunClientPrivate::uploadFile(const QByteArray &filedata,
                                              const QString &remote_path)
 {
-    // read file
-    QFile file(local_path);
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        error("can not open or read file:" + local_path);
-    }
-
-    const QByteArray &file_data = file.readAll();
-
-    QString content_len = QString::number(file_data.length());
+    QString content_len = QString::number(filedata.length());
     QString path_url =  "/" + _bucket + "/" + remote_path;
     QString now_time =  rfc1123_datetime(time(NULL)).c_str();
 
@@ -75,7 +66,7 @@ QNetworkReply* UpyunClientPrivate::uploadFile(const QString &local_path,
     request.setRawHeader("Date", now_time.toLatin1());
     request.setRawHeader("mkdir","true");
 
-    QNetworkReply *reply = _qnam.put(request, file_data);
+    QNetworkReply *reply = _qnam.put(request, filedata);
 
     return reply;
 
