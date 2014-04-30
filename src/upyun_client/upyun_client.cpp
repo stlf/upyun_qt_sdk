@@ -6,6 +6,7 @@
 #include "upyun_client_impl.h"
 
 #define HTTP_OK 200
+#define HTTP_ABORT -1
 
 UpyunClient::UpyunClient(const QString &usr, const QString &pass, const QString &bucket):
     d_ptr(new UpyunClientPrivate(usr, pass, bucket, this))
@@ -13,13 +14,40 @@ UpyunClient::UpyunClient(const QString &usr, const QString &pass, const QString 
 
 }
 
-int waiting_reply(QNetworkReply *reply)
+template<typename CT>
+int waiting_reply(QNetworkReply *reply, CT *c)
 {
     QEventLoop loop;
+
+    QObject::connect(c, SIGNAL(notifyStop()), &loop, SLOT(quit()), Qt::QueuedConnection);
+
+    bool is_notify_stop = false;
+    QObject::connect(c, &CT::notifyStop, [&](){is_notify_stop = true;});
+
+    QObject::connect(reply, SIGNAL(downloadProgress(qint64,qint64)),
+                     c, SIGNAL(progress(qint64,qint64)), Qt::UniqueConnection);
+
+    QObject::connect(reply, SIGNAL(uploadProgress(qint64,qint64)),
+                     c, SIGNAL(progress(qint64,qint64)), Qt::UniqueConnection);
+
+
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
     loop.exec();
 
+    if(is_notify_stop)
+        return HTTP_ABORT;
+
     return reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+}
+
+bool check_reply_code(const int code)
+{
+    if(HTTP_OK == code)
+        return true;
+    if(HTTP_ABORT == code)
+        return true;
+    return false;
 }
 
 void UpyunClient::uploadFile(const QString &local_path, const QString &remote_path)
@@ -32,7 +60,7 @@ void UpyunClient::uploadFile(const QString &local_path, const QString &remote_pa
 
     Q_D(UpyunClient);
     QNetworkReply* reply = d->uploadFile(file.readAll(), remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code(waiting_reply(reply, this)))
          throw QString(reply->errorString());
 }
 
@@ -40,7 +68,7 @@ QByteArray UpyunClient::downloadFile(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->downloadFile(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
          throw QString(reply->errorString());
 
     return reply->readAll();
@@ -50,7 +78,7 @@ void UpyunClient::removeFile(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->removeFile(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
         throw QString(reply->errorString());
 }
 
@@ -58,7 +86,7 @@ void UpyunClient::makeDir(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->makeDir(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
         throw QString(reply->errorString());
 }
 
@@ -66,7 +94,7 @@ void UpyunClient::removeDir(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->removeDir(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
         throw QString(reply->errorString());
 }
 
@@ -74,7 +102,7 @@ QList<upyun_file_info> UpyunClient::listDir(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->listDir(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
          throw QString(reply->errorString());
 
     const QString &info = QString::fromUtf8(reply->readAll());
@@ -103,7 +131,7 @@ QString UpyunClient::getBucketUsage()
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->getBucketInfo();
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
          throw QString(reply->errorString());
 
     return QString::fromUtf8(reply->readAll());
@@ -113,7 +141,7 @@ upyun_file_info UpyunClient::getFileInfo(const QString &remote_path)
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->getFileInfo(remote_path);
-    if(HTTP_OK != waiting_reply(reply))
+    if(!check_reply_code( waiting_reply(reply, this)) )
         throw QString(reply->errorString());
 
     upyun_file_info fi;
@@ -128,6 +156,7 @@ upyun_file_info UpyunClient::getFileInfo(const QString &remote_path)
 
     return fi;
 }
+
 
 
 

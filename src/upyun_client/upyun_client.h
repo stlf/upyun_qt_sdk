@@ -32,9 +32,15 @@ public:
     QString getBucketUsage();
     upyun_file_info getFileInfo(const QString &remote_path);
 
+
+signals:
+    void notifyStop();
+    void progress(qint64 bytesFinished, qint64 bytesTotal);
+
 protected:
     Q_DECLARE_PRIVATE(UpyunClient)
     UpyunClientPrivate* d_ptr;
+
 
 };
 
