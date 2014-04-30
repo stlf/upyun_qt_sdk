@@ -5,8 +5,8 @@
 #include "../upyun_client.h"
 
 #define BUCKET "stlf-first-bucket"
-#define OPERATOR "test"
-#define PASS "testtest"
+#define OPERATOR ""
+#define PASS ""
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
