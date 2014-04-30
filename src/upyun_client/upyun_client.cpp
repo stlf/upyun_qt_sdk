@@ -6,12 +6,12 @@
 #include "upyun_client_impl.h"
 
 #define HTTP_OK 200
+
 UpyunClient::UpyunClient(const QString &usr, const QString &pass, const QString &bucket):
     d_ptr(new UpyunClientPrivate(usr, pass, bucket, this))
 {
 
 }
-
 
 int waiting_reply(QNetworkReply *reply)
 {
@@ -44,7 +44,6 @@ QByteArray UpyunClient::downloadFile(const QString &remote_path)
          throw QString(reply->errorString());
 
     return reply->readAll();
-
 }
 
 void UpyunClient::removeFile(const QString &remote_path)
@@ -79,23 +78,20 @@ QList<upyun_file_info> UpyunClient::listDir(const QString &remote_path)
          throw QString(reply->errorString());
 
     const QString &info = QString::fromUtf8(reply->readAll());
-
     const QStringList &file_items = info.split("\n");
 
     QList<upyun_file_info> file_infos;
-
     foreach(QString file_item, file_items)
     {
         upyun_file_info fi;
 
         const QStringList &cols = file_item.split("\t");
-
         if(cols.size() !=  4)
             throw QString("remote dir info can not be parsed!");
         fi.name = cols[0];
         fi.type = cols[1];
         fi.size = cols[2];
-        fi.last_modify_date = cols[3];
+        fi.date = cols[3];
 
         file_infos.push_back(fi);
     }
@@ -103,7 +99,7 @@ QList<upyun_file_info> UpyunClient::listDir(const QString &remote_path)
     return file_infos;
 }
 
-QString UpyunClient::getBucketInfo()
+QString UpyunClient::getBucketUsage()
 {
     Q_D(UpyunClient);
     QNetworkReply* reply = d->getBucketInfo();
@@ -113,16 +109,25 @@ QString UpyunClient::getBucketInfo()
     return QString::fromUtf8(reply->readAll());
 }
 
-//upyun_file_info UpyunClient::getFileInfo(const QString &remote_path)
-//{
-//    Q_D(UpyunClient);
-//    QNetworkReply* reply = d->getFileInfo(remote_path);
-//    if(HTTP_OK != waiting_reply(reply))
-//        throw QString(reply->errorString());
+upyun_file_info UpyunClient::getFileInfo(const QString &remote_path)
+{
+    Q_D(UpyunClient);
+    QNetworkReply* reply = d->getFileInfo(remote_path);
+    if(HTTP_OK != waiting_reply(reply))
+        throw QString(reply->errorString());
 
-//    reply->header(QNetworkRequest::ServerHeader);
+    upyun_file_info fi;
+    QStringList fp = remote_path.split("/");
 
-//}
+    int s = fp.size();
+    if(s) {fi.name = fp[s - 1];}
+
+    fi.type = reply->rawHeader("x-upyun-file-type");
+    fi.size = reply->rawHeader("x-upyun-file-size");
+    fi.date = reply->rawHeader("x-upyun-file-date");
+
+    return fi;
+}
 
 
 

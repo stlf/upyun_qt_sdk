@@ -11,7 +11,7 @@ public:
     QString name;
     QString type;
     QString size;
-    QString last_modify_date;
+    QString date;
 };
 
 class UpyunClientPrivate;
@@ -29,8 +29,8 @@ public:
     void removeDir(const QString &remote_path);
     QList<upyun_file_info> listDir(const QString &remote_path);
 
-    QString getBucketInfo();
-    // upyun_file_info getFileInfo(const QString &remote_path);
+    QString getBucketUsage();
+    upyun_file_info getFileInfo(const QString &remote_path);
 
 protected:
     Q_DECLARE_PRIVATE(UpyunClient)
