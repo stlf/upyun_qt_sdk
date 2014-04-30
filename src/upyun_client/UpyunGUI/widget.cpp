@@ -6,7 +6,7 @@
 
 #define BUCKET "stlf-first-bucket"
 #define OPERATOR "test"
-#define PASS "tttttttt"
+#define PASS "t8t8t8t8"
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -18,10 +18,12 @@ Widget::Widget(QWidget *parent) :
     UpyunClient c(OPERATOR,PASS, BUCKET);
 
     try{
+        qDebug() << c.getBucketUsage(); // 8
+
         QString fn = "/hehe2.jpg";
         QString dir = "/lovey3/";
 
-        c.uploadFile("c:/1.jpg", fn); // 1
+        // c.uploadFile("c:/1.jpg", fn); // 1
 
         foreach(upyun_file_info fi, c.listDir("/")) // 2
         {
@@ -35,7 +37,6 @@ Widget::Widget(QWidget *parent) :
         c.makeDir(dir); // 6
         c.removeDir(dir); // 7
 
-        qDebug() << c.getBucketUsage(); // 8
     }
     catch(const QString &e)
     {
