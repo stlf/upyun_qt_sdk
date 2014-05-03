@@ -1,6 +1,7 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QFile>
+#include <QStringList>
 
 #include "upyun_client.h"
 #include "upyun_client_impl.h"
@@ -22,6 +23,7 @@ int waiting_reply(QNetworkReply *reply, CT *c)
     QObject::connect(c, SIGNAL(notifyStop()), &loop, SLOT(quit()), Qt::QueuedConnection);
 
     bool is_notify_stop = false;
+
     QObject::connect(c, &CT::notifyStop, [&](){is_notify_stop = true;});
 
     QObject::connect(reply, SIGNAL(downloadProgress(qint64,qint64)),
@@ -32,6 +34,7 @@ int waiting_reply(QNetworkReply *reply, CT *c)
 
 
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
 
     loop.exec();
 

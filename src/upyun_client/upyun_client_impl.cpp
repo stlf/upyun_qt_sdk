@@ -1,5 +1,5 @@
 #include <time.h>
-#include <QUrlQuery>
+// #include <QUrlQuery>
 #include <QCryptographicHash>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -15,6 +15,7 @@ std::string rfc1123_datetime( time_t time )
     struct tm * timeinfo;
     char buffer [80];
 
+    std::setlocale(LC_ALL, "en_US.UTF-8");
     timeinfo = gmtime ( &time );
     strftime (buffer,80,"%a, %d %b %Y %H:%M:%S GMT",timeinfo);
 

@@ -14,7 +14,12 @@ class Widget : public QWidget
 
 public:
     explicit Widget(QWidget *parent = 0);
+    void init();
+
     ~Widget();
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::Widget *ui;

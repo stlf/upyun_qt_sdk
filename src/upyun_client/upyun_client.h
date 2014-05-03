@@ -15,6 +15,7 @@ public:
 };
 
 class UpyunClientPrivate;
+class QNetworkReply;
 
 class /*UPYUN_CLIENTSHARED_EXPORT*/ UpyunClient : public QObject
 {

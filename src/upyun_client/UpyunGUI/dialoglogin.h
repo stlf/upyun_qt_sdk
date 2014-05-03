@@ -15,6 +15,21 @@ public:
     explicit DialogLogin(QWidget *parent = 0);
     ~DialogLogin();
 
+    static DialogLogin &get()
+    {
+        static DialogLogin dlg;
+        return dlg;
+    }
+
+private slots:
+
+    void on_pushButton_2_clicked();
+
+public:
+    QString bucket_;
+    QString operator_;
+    QString pass_;
+
 private:
     Ui::DialogLogin *ui;
 };

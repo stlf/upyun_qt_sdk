@@ -29,3 +29,11 @@ HEADERS  += widget.h \
 
 FORMS    += widget.ui \
     dialoglogin.ui
+
+RESOURCES += \
+    res.qrc
+
+OTHER_FILES += \
+    bar-descriptor.xml \
+    bar-descriptor.xml \
+    bar-descriptor.xml
