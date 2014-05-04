@@ -53,9 +53,7 @@ void Widget::init()
         UpyunClient c(DialogLogin::get().operator_,
                       DialogLogin::get().pass_,
                       DialogLogin::get().bucket_);
-
-        ui->label->setText("已用空间：" + c.getBucketUsage());
-
+        ui->label->setText("已用空间:" + c.getBucketUsage());
         ui->treeWidget->clear();
         foreach(upyun_file_info fi, c.listDir("/"))
         {

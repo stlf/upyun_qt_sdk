@@ -7,6 +7,7 @@
 #include <QFile>
 #include <string>
 #include "upyun_client_impl.h"
+#include <clocale>
 
 const static QString upyun_api_host = "http://v0.api.upyun.com";
 
