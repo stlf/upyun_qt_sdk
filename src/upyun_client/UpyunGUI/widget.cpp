@@ -4,12 +4,13 @@
 #include "../upyun_client.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "dialoglogin.h"
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget), _cur_dir("/")
 {
     ui->setupUi(this);
 
@@ -28,7 +29,7 @@ Widget::Widget(QWidget *parent) :
 
         // c.uploadFile("c:/1.jpg", fn); // 1
 
-        foreach(upyun_file_info fi, c.listDir("/")) // 2
+        foreach(upyun_file_info fi, c.listDir(_cur_dir)) // 2
         {
             qDebug() << fi.name << " " << fi.type << " " << fi.size << " " << fi.date;
         }
@@ -96,4 +97,63 @@ void Widget::on_pushButton_clicked()
     } else {
         QMessageBox::information(NULL, tr("Path"), tr("You selected ") + path);
     }
+}
+
+void Widget::on_pushButton_4_clicked()
+{
+    bool isOK;
+    QString text = QInputDialog::getText(NULL, "提示","请输入文件夹名：",
+                                         QLineEdit::Normal,
+                                         "",
+                                         &isOK);
+    if(isOK)
+    {
+        UpyunClient c(DialogLogin::get().operator_,
+                      DialogLogin::get().pass_,
+                      DialogLogin::get().bucket_);
+
+        try{
+            c.makeDir(_cur_dir + QUrl::toPercentEncoding(text));
+            init();
+        }catch(const QString &e)
+        {
+            QMessageBox::information(this, "error", e);
+        }
+    }
+}
+
+void Widget::on_pushButton_5_clicked()
+{
+    UpyunClient c(DialogLogin::get().operator_,
+                  DialogLogin::get().pass_,
+                  DialogLogin::get().bucket_);
+
+    QString  msg;
+    if(ui->treeWidget->selectedItems().size() > 0)
+    {
+        const QTreeWidgetItem &ti = *ui->treeWidget->selectedItems()[0];
+        msg = "确定删除 " + ti.text(0) + " 吗？";
+
+        if(QMessageBox::No
+                == QMessageBox::information(this, "提示", msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+            return;
+        try{
+            QString url = _cur_dir + ti.text(0);
+            if("" == ti.text(1))
+            { // fold
+                c.removeDir(QUrl::toPercentEncoding(url));
+            }
+            else
+            { // file
+                c.removeFile(QUrl::toPercentEncoding(url));
+            }
+
+            init();
+        }
+        catch(const QString &e)
+        {
+            QMessageBox::information(this, "error", e);
+        }
+    }
+
 }

@@ -52,7 +52,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_5">
        <property name="text">
-        <string>删除远程文件夹</string>
+        <string>删除</string>
        </property>
       </widget>
      </item>
@@ -71,13 +71,6 @@
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
         <string>下载文件</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>删除远程文件</string>
        </property>
       </widget>
      </item>
