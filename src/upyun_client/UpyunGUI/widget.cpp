@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QDesktopServices>
 
 #include "dialoglogin.h"
 
@@ -92,11 +93,30 @@ Widget::~Widget()
 void Widget::on_pushButton_clicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Open file"), ".", tr("All Files(*.*)"));
-    if(path.length() == 0) {
-        QMessageBox::information(NULL, tr("Path"), tr("You didn't select any files."));
-    } else {
-        QMessageBox::information(NULL, tr("Path"), tr("You selected ") + path);
+    if(path.length() == 0)
+        return;
+
+    // QMessageBox::information(NULL, tr("Path"), tr("You selected ") + path);
+    UpyunClient c(DialogLogin::get().operator_,
+                  DialogLogin::get().pass_,
+                  DialogLogin::get().bucket_);
+
+    QStringList &sl = path.split("/");
+    if(sl.size())
+    {
+        QString fn = sl[sl.size() - 1];
+        try
+        {
+            c.uploadFile(path, _cur_dir + fn);
+            init();
+        }
+        catch(const QString &e)
+        {
+            QMessageBox::information(this, "error", e);
+        }
+
     }
+
 }
 
 void Widget::on_pushButton_4_clicked()
@@ -106,20 +126,22 @@ void Widget::on_pushButton_4_clicked()
                                          QLineEdit::Normal,
                                          "",
                                          &isOK);
-    if(isOK)
-    {
-        UpyunClient c(DialogLogin::get().operator_,
-                      DialogLogin::get().pass_,
-                      DialogLogin::get().bucket_);
+    if(!isOK)
+        return;
 
-        try{
-            c.makeDir(_cur_dir + QUrl::toPercentEncoding(text));
-            init();
-        }catch(const QString &e)
-        {
-            QMessageBox::information(this, "error", e);
-        }
+    UpyunClient c(DialogLogin::get().operator_,
+                  DialogLogin::get().pass_,
+                  DialogLogin::get().bucket_);
+    try
+    {
+        c.makeDir(_cur_dir + QUrl::toPercentEncoding(text));
+        init();
     }
+    catch(const QString &e)
+    {
+        QMessageBox::information(this, "error", e);
+    }
+
 }
 
 void Widget::on_pushButton_5_clicked()
@@ -155,5 +177,44 @@ void Widget::on_pushButton_5_clicked()
             QMessageBox::information(this, "error", e);
         }
     }
+
+}
+
+void Widget::on_pushButton_2_clicked()
+{
+    if(ui->treeWidget->selectedItems().size() <= 0)
+        return;
+    const QTreeWidgetItem &ti = *ui->treeWidget->selectedItems()[0];
+    const QString &fn = ti.text(0);
+
+    UpyunClient c(DialogLogin::get().operator_,
+                  DialogLogin::get().pass_,
+                  DialogLogin::get().bucket_);
+    try
+    {
+        const QByteArray &buf = c.downloadFile(_cur_dir + fn);
+        const QString &path = QFileDialog::getExistingDirectory(this, tr("Open dir"));
+
+        const QString &fp = path + "/" + fn;
+        QFile f(fp);
+        if(!f.open(QIODevice::WriteOnly))
+            throw QString("open " + fn + " error!");
+        f.write(buf);
+
+
+        if(QMessageBox::Yes
+                == QMessageBox::information(this, "提示", "下载成功,现在就查看吗?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+        {
+            QDesktopServices::openUrl(fp);
+        }
+
+    }
+    catch(const QString &e)
+    {
+        QMessageBox::information(this, "error", e);
+    }
+
+
+
 
 }
