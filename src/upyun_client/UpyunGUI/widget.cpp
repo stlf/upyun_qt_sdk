@@ -214,7 +214,4 @@ void Widget::on_pushButton_2_clicked()
         QMessageBox::information(this, "error", e);
     }
 
-
-
-
 }
