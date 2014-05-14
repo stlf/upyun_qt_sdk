@@ -101,7 +101,7 @@ void Widget::on_pushButton_clicked()
                   DialogLogin::get().pass_,
                   DialogLogin::get().bucket_);
 
-    QStringList &sl = path.split("/");
+    const QStringList &sl = path.split("/");
     if(sl.size())
     {
         QString fn = sl[sl.size() - 1];

@@ -96,7 +96,7 @@ public:
 
     void uploadFile(const QString &local_path)
     {
-        QStringList &sl = local_path.split("/");
+        const QStringList &sl = local_path.split("/");
         if(sl.size())
         {
             QString fn = sl[sl.size() - 1];
