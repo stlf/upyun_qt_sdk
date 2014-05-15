@@ -11,53 +11,31 @@
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget), _cur_dir("/")
+    ui(new Ui::Widget), _cur_dir("/"),_upy(new UpyunUser(DialogLogin::get().operator_,
+                                                         DialogLogin::get().pass_,
+                                                         DialogLogin::get().bucket_))
 {
     ui->setupUi(this);
-
-
-    UpyunClient c(DialogLogin::get().operator_,
-                  DialogLogin::get().pass_,
-                  DialogLogin::get().bucket_);
-
     init();
-
-    try{
-        qDebug() << c.getBucketUsage(); // 8
-
-        QString fn = "/hehe2.jpg";
-        QString dir = "/lovey3/";
-
-        // c.uploadFile("c:/1.jpg", fn); // 1
-
-        foreach(upyun_file_info fi, c.listDir(_cur_dir)) // 2
-        {
-            qDebug() << fi.name << " " << fi.type << " " << fi.size << " " << fi.date;
-        }
-
-        qDebug() << c.downloadFile(fn).size(); // 3
-
-        qDebug() << c.getFileInfo(fn).date; // 4
-        c.removeFile(fn); // 5
-        c.makeDir(dir); // 6
-        c.removeDir(dir); // 7
-
-    }
-    catch(const QString &e)
-    {
-        qDebug() << "error:" + e;
-    }
 }
 
+#define PARENT_DIR "上一目录.."
 void Widget::init()
 {
     try{
-        UpyunClient c(DialogLogin::get().operator_,
-                      DialogLogin::get().pass_,
-                      DialogLogin::get().bucket_);
+
+        UpyunUser &c = *_upy;
+        ui->label_2->setText("当前目录:" + c.pwd());
         ui->label->setText("已用空间:" + c.getBucketUsage());
         ui->treeWidget->clear();
-        foreach(upyun_file_info fi, c.listDir("/"))
+
+        if(c.pwd() != "/")
+        {
+            QStringList sl; sl << PARENT_DIR;
+            QTreeWidgetItem * pitem = new QTreeWidgetItem(ui->treeWidget, sl);
+        }
+
+        foreach(upyun_file_info fi, c.listDir())
         {
             QStringList texts;
 
@@ -96,18 +74,15 @@ void Widget::on_pushButton_clicked()
     if(path.length() == 0)
         return;
 
-    // QMessageBox::information(NULL, tr("Path"), tr("You selected ") + path);
-    UpyunClient c(DialogLogin::get().operator_,
-                  DialogLogin::get().pass_,
-                  DialogLogin::get().bucket_);
-
+    UpyunUser &c = *_upy;
     const QStringList &sl = path.split("/");
     if(sl.size())
     {
         QString fn = sl[sl.size() - 1];
         try
         {
-            c.uploadFile(path, _cur_dir + fn);
+            c.uploadFile(path);
+
             init();
         }
         catch(const QString &e)
@@ -129,12 +104,11 @@ void Widget::on_pushButton_4_clicked()
     if(!isOK)
         return;
 
-    UpyunClient c(DialogLogin::get().operator_,
-                  DialogLogin::get().pass_,
-                  DialogLogin::get().bucket_);
+    UpyunUser &c = *_upy;
+
     try
     {
-        c.makeDir(_cur_dir + QUrl::toPercentEncoding(text));
+        c.makeDir(text);
         init();
     }
     catch(const QString &e)
@@ -146,10 +120,7 @@ void Widget::on_pushButton_4_clicked()
 
 void Widget::on_pushButton_5_clicked()
 {
-    UpyunClient c(DialogLogin::get().operator_,
-                  DialogLogin::get().pass_,
-                  DialogLogin::get().bucket_);
-
+    UpyunUser &c = *_upy;
     QString  msg;
     if(ui->treeWidget->selectedItems().size() > 0)
     {
@@ -160,14 +131,13 @@ void Widget::on_pushButton_5_clicked()
                 == QMessageBox::information(this, "提示", msg, QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
             return;
         try{
-            QString url = _cur_dir + ti.text(0);
             if("" == ti.text(1))
             { // fold
-                c.removeDir(QUrl::toPercentEncoding(url));
+                c.removeDir(ti.text(0));
             }
             else
             { // file
-                c.removeFile(QUrl::toPercentEncoding(url));
+                c.removeFile(ti.text(0));
             }
 
             init();
@@ -187,12 +157,10 @@ void Widget::on_pushButton_2_clicked()
     const QTreeWidgetItem &ti = *ui->treeWidget->selectedItems()[0];
     const QString &fn = ti.text(0);
 
-    UpyunClient c(DialogLogin::get().operator_,
-                  DialogLogin::get().pass_,
-                  DialogLogin::get().bucket_);
+    UpyunUser &c = *_upy;
     try
     {
-        const QByteArray &buf = c.downloadFile(_cur_dir + fn);
+        const QByteArray &buf = c.downloadFile(fn);
         const QString &path = QFileDialog::getExistingDirectory(this, tr("Open dir"));
 
         const QString &fp = path + "/" + fn;
@@ -214,4 +182,19 @@ void Widget::on_pushButton_2_clicked()
         QMessageBox::information(this, "error", e);
     }
 
+}
+
+void Widget::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    if(PARENT_DIR == item->text(0))
+    {
+        _upy->gotoParentDir();
+        init();
+        return;
+    }
+    if( "" == item->text(1))
+    {
+      _upy->cd(item->text(0));
+      init();
+    }
 }

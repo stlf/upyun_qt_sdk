@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QList>
 
+
 class /*UPYUN_CLIENTSHARED_EXPORT*/ upyun_file_info
 {
 public:
@@ -46,25 +47,29 @@ protected:
 };
 
 #include <QStringList>
+#include <QDebug>
+#include <QUrl>
 class UpyunUser : public UpyunClient
 {
     Q_OBJECT
 public:
     UpyunUser(const QString &usr, const QString &pass, const QString &bucket):
-        UpyunClient(usr, pass, bucket)
+        UpyunClient(usr, pass, bucket), _cur_dir("")
     {
 
     }
 
     QString pwd()
     {
+        if(_cur_dir == "")
+            return "/";
         return _cur_dir;
     }
 
     QString parentDir()
     {
-        if("/" == pwd())
-            return "/";
+        if("" == pwd())
+            return "";
         QString dir = _cur_dir;
         dir.remove(_cur_dir.lastIndexOf("/"), _cur_dir.length() - _cur_dir.lastIndexOf("/"));
 
@@ -100,7 +105,8 @@ public:
         if(sl.size())
         {
             QString fn = sl[sl.size() - 1];
-            UpyunClient::uploadFile(local_path, _cur_dir + "/" + fn);
+            qDebug() << _cur_dir + "/" + fn;
+            UpyunClient::uploadFile(local_path, QUrl::toPercentEncoding(_cur_dir + "/" + fn));
         }
         else
         {
@@ -110,32 +116,32 @@ public:
 
     QByteArray downloadFile(const QString &file_name)
     {
-        return UpyunClient::downloadFile(_cur_dir +  "/" + file_name);
+        return UpyunClient::downloadFile( QUrl::toPercentEncoding(_cur_dir +  "/" + file_name) );
     }
 
     void removeFile(const QString &file_name)
     {
-        UpyunClient::removeFile(_cur_dir + "/" + file_name);
+        UpyunClient::removeFile( QUrl::toPercentEncoding(_cur_dir + "/" + file_name) );
     }
 
     void makeDir(const QString &dir_name)
     {
-        UpyunClient::makeDir(_cur_dir + "/" + dir_name);
+        UpyunClient::makeDir( QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
     }
 
     void removeDir(const QString &dir_name)
     {
-        UpyunClient::removeDir(_cur_dir + "/" + dir_name);
+        UpyunClient::removeDir( QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
     }
 
     QList<upyun_file_info> listDir()
     {
-        return UpyunClient::listDir(_cur_dir);
+        return UpyunClient::listDir( QUrl::toPercentEncoding(_cur_dir) );
     }
 
     upyun_file_info getFileInfo(const QString &file_name)
     {
-        return UpyunClient::getFileInfo(_cur_dir + "/" + file_name);
+        return UpyunClient::getFileInfo( QUrl::toPercentEncoding(_cur_dir + "/" + file_name) );
     }
 
 private:
