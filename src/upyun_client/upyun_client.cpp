@@ -118,7 +118,10 @@ QList<upyun_file_info> UpyunClient::listDir(const QString &remote_path)
 
         const QStringList &cols = file_item.split("\t");
         if(cols.size() !=  4)
-            throw QString("remote dir info can not be parsed!");
+        {
+            continue;
+            // throw QString("remote dir info can not be parsed!");
+        }
         fi.name = cols[0];
         fi.type = cols[1];
         fi.size = cols[2];
