@@ -82,7 +82,7 @@ public:
         return _cur_dir;
     }
 
-    QString cd(const QString& dir)
+    void cd(const QString& dir)
     {
         foreach(upyun_file_info fi, listDir())
         {
@@ -91,12 +91,9 @@ public:
                 if(fi.name == dir)
                 {
                     _cur_dir += "/" + dir;
-                    return _cur_dir;
                 }
             }
         }
-
-        throw QString("can not find dir:") + dir;
     }
 
     void uploadFile(const QString &local_path)

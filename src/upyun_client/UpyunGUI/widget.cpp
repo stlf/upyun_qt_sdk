@@ -173,7 +173,7 @@ void Widget::on_pushButton_2_clicked()
         if(QMessageBox::Yes
                 == QMessageBox::information(this, "提示", "下载成功,现在就查看吗?", QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
         {
-            QDesktopServices::openUrl(fp);
+            QDesktopServices::openUrl(QUrl::fromLocalFile(fp));
         }
 
     }
