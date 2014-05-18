@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDesktopServices>
+#include <QDateTime>
 
 #include "dialoglogin.h"
 
@@ -44,7 +45,8 @@ void Widget::init()
                 texts << fi.size;
             else
                 texts << "";
-            texts << fi.date;
+
+            texts << QDateTime::fromTime_t(fi.date.toUInt()).toString();
             QTreeWidgetItem * pitem = new QTreeWidgetItem(ui->treeWidget, texts);
 
             // load icon
