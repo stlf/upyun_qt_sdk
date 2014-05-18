@@ -26,7 +26,7 @@ void Widget::init()
 
         UpyunUser &c = *_upy;
         ui->label_2->setText("当前目录:" + c.pwd());
-        ui->label->setText("已用空间:" + c.getBucketUsage());
+        ui->label->setText("已用空间:" + QString::number(c.getBucketUsage().toInt() / 1000000.0f) + " MB");
         ui->treeWidget->clear();
 
         if(c.pwd() != "/")
