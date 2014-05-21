@@ -384,7 +384,13 @@ QVariant ApplicationUI::listDir()
             QVariantMap item;
             item.insert("name", i.name);
             item.insert("type", i.type);
-            item.insert("size", i.size);
+            QString sf;
+            if(i.size != "0"){
+                sf = QString::number(i.size.toInt() / 1000.0f) + "KB";
+            }else{
+                sf = "";
+            }
+            item.insert("size", sf);
             item.insert("date", QDateTime::fromTime_t(i.date.toInt()).toString());
             list.append(item);
        }

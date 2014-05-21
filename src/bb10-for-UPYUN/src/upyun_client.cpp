@@ -77,6 +77,7 @@ void UpyunClient::uploadFile(const QString &local_path, const QString &remote_pa
         throw QString("can not open or read file:" + local_path);
     }
 
+    qDebug() << "=====>>>>>>>>" << remote_path;
     Q_D(UpyunClient);
     QNetworkReply* reply = d->uploadFile(file.readAll(), remote_path);
     if(!check_reply_code(waiting_reply(reply, this)))
@@ -106,7 +107,7 @@ void UpyunClient::makeDir(const QString &remote_path)
     Q_D(UpyunClient);
     QNetworkReply* reply = d->makeDir(remote_path);
     if(!check_reply_code( waiting_reply(reply, this)) )
-        throw QString(reply->errorString());
+        throw QString(reply->errorString() + ":" + remote_path);
 }
 
 void UpyunClient::removeDir(const QString &remote_path)

@@ -1,5 +1,5 @@
 1
-126
+129
 action_icons/Action_Icons.xls
 action_icons/ic_add.png
 action_icons/ic_add_entry.png
@@ -123,6 +123,9 @@ action_icons/ic_view_post.png
 action_icons/ic_zoom_in.png
 action_icons/ic_zoom_out.png
 data.xml
+images/documents.png
+images/folder.png
+images/upyun_logo.jpg
 ItemPage.qml
 Login.qml
 main.qml

@@ -216,3 +216,17 @@ pip-log.txt
 build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile
 build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile.Debug
 build-upyun_client-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile.Release
+src/bb10-for-UPYUN/arm/o.le-v7-g/.moc/moc_applicationui.cpp
+src/bb10-for-UPYUN/arm/o.le-v7-g/.moc/moc_upyun_client.cpp
+src/bb10-for-UPYUN/arm/o.le-v7-g/.moc/moc_upyun_client_impl.cpp
+src/bb10-for-UPYUN/arm/Makefile
+*.Release
+*.Debug
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/Makefile
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/ui_dialoglogin.h
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Debug/ui_widget.h
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Release/Makefile
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Release/ui_dialoglogin.h
+src/upyun_client/build-UpyunGUI-Desktop_Qt_5_2_1_MSVC2010_32bit-Release/ui_widget.h
+src/upyun_client/UpyunGUI/UpyunGUI.pro.user.6ad6b65
+src/bb10-for-UPYUN/arm/o.le-v7-g/bb10_for_UPYUN

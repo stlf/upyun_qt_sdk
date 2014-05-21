@@ -15,6 +15,8 @@
  */
 
 import bb.cascades 1.2
+import bb.cascades.pickers 1.0
+import bb.system 1.0
 
 NavigationPane {
     id: root
@@ -41,6 +43,16 @@ NavigationPane {
             
         ]
     }
+    
+    function listdir()
+    {
+        var file_items = _app.listDir() 
+        
+        model_data.clear()
+        
+        model_data.append(file_items)
+    }
+    
     Page {
            
         onCreationCompleted: {
@@ -58,17 +70,55 @@ NavigationPane {
                     id: model_data
                 }
                 
+                function removeDir(dir_name)
+                {
+                    _app.removeDir(dir_name)
+                }
+                function removeFile(file_name)
+                {
+                    _app.removeFile(file_name)
+                }
+                function listdir()
+                {
+                    root.listdir()
+                }
+                
                 accessibility.name: "TODO: Add property content"
                 
                 listItemComponents: [
                     ListItemComponent {
                         StandardListItem {
+                            id: file_list_item
                             accessibility.description: ""
-                            imageSource: "asset:///action_icons/ic_entry.png"
+                            imageSource: ListItemData.type === "F" ?
+                            "asset:///images/folder.png":"asset:///images/documents.png"
                             title: ListItemData.name
                             status: ListItemData.size
-                            description: ListItemData.date
+                            description: ListItemData.date 
                             accessibility.name: "TODO: Add property content"
+                            
+                            contextActions: [
+                                ActionSet {
+                                    title: ListItemData.name
+                                    ActionItem {
+                                        title: "Remove"
+                                        onTriggered: {
+                                            if(ListItemData.size === "")
+                                            {
+                                                file_list_item.ListItem.view.removeDir(ListItemData.name)    
+                                            }
+                                            else
+                                            {
+                                                file_list_item.ListItem.view.removeFile(ListItemData.name)
+                                            }
+                                            
+                                            file_list_item.ListItem.view.listdir()
+                                        }
+                                        imageSource: "asset:///action_icons/ic_delete.png"
+                                    }
+                                
+                                }
+                            ]
 
                         }
 
@@ -83,7 +133,8 @@ NavigationPane {
                 title: "Upoad file"
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
-
+                    file_picker.open()
+                    
                 }
                 imageSource: "asset:///action_icons/ic_add_entry.png"
             },
@@ -91,6 +142,7 @@ NavigationPane {
                 title: "Add folder"
                 ActionBar.placement: ActionBarPlacement.OnBar
                 onTriggered: {
+                    add_folder_prompt.exec()
 
                 }
                 imageSource: "asset:///action_icons/ic_add_folder.png"
@@ -100,24 +152,57 @@ NavigationPane {
 
     }
     attachedObjects: [
+        SystemToast {
+            id: toast
+        },
+        SystemDialog {
+            id: dialog
+        },
+        FilePicker {
+            id: file_picker
+        
+            
+            title: qsTr ("Please select the upload file:")
+            
+            onFileSelected: {
+                var selectf = selectedFiles[0]
+                if(selectf === "")
+                	return;
+                
+                if(_app.uploadFile(selectf))
+                {
+                    toast.body = "Upload file succeed!"                    
+                    toast.show()
+                    
+                    listdir()
+                }
+            }
+        },
+        SystemPrompt{
+            id: add_folder_prompt
+            
+            onFinished: {
+                var dir_name = inputFieldTextEntry()	
+                if (value === SystemUiResult.ConfirmButtonSelection)
+                {
+                    if (_app.makeDir(dir_name)) {
+                        toast.body = "Make dir succeed!"
+                        
+                        toast.show()
+                        
+                        listdir()
+                    
+                    }                        
+                }        	               
+            }
+            inputField.defaultText: web.title
+            title: "Make dir"
+            body: "Input remote dir name: "
+        },
         Login {
             id: login
             onClosed: {  
-                var file_items = _app.listDir() 
-                
-                model_data.clear()
-                
-                model_data.append(file_items)
-                
-                // only for test:
-                for(var i = 0; i !== file_items.length; ++i)
-                {
-                    for (var prop in file_items[i]) {
-                        var _js = {"nihao":"hehe"}
-                        console.log("Object item:", prop, "=", file_items[i][prop], _js.nihao)
-                    }         
-                }
-                
+                listdir()                                
             }
         },
         ComponentDefinition {

@@ -128,7 +128,7 @@ public:
 
     void removeDir(const QString &dir_name)
     {
-        UpyunClient::removeDir( QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
+        UpyunClient::removeDir( QUrl(_cur_dir + "/" + dir_name).toEncoded() );
     }
 
     QList<upyun_file_info> listDir()

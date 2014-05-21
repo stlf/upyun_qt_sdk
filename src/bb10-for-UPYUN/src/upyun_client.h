@@ -119,7 +119,7 @@ public:
         {
             QString fn = sl[sl.size() - 1];
             qDebug() << _cur_dir + "/" + fn;
-            UpyunClient::uploadFile(local_path, QUrl::toPercentEncoding(_cur_dir + "/" + fn));
+            UpyunClient::uploadFile(local_path, QUrl(_cur_dir + "/" + fn).toEncoded());
         }
         else
         {
@@ -129,32 +129,32 @@ public:
 
     QByteArray downloadFile(const QString &file_name)
     {
-        return UpyunClient::downloadFile( QUrl::toPercentEncoding(_cur_dir +  "/" + file_name) );
+        return UpyunClient::downloadFile( QUrl(_cur_dir +  "/" + file_name).toEncoded() );
     }
 
     void removeFile(const QString &file_name)
     {
-        UpyunClient::removeFile( QUrl::toPercentEncoding(_cur_dir + "/" + file_name) );
+        UpyunClient::removeFile( QUrl(_cur_dir + "/" + file_name).toEncoded() );
     }
 
     void makeDir(const QString &dir_name)
     {
-        UpyunClient::makeDir( QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
+        UpyunClient::makeDir( QUrl(_cur_dir + "/" + dir_name).toEncoded() ); //( _cur_dir + "/" + dir_name);// QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
     }
 
     void removeDir(const QString &dir_name)
     {
-        UpyunClient::removeDir( QUrl::toPercentEncoding(_cur_dir + "/" + dir_name) );
+        UpyunClient::removeDir( QUrl(_cur_dir + "/" + dir_name).toEncoded() );
     }
 
     QList<upyun_file_info> listDir()
     {
-        return UpyunClient::listDir( QUrl::toPercentEncoding(_cur_dir) );
+        return UpyunClient::listDir( QUrl(_cur_dir).toEncoded() );
     }
 
     upyun_file_info getFileInfo(const QString &file_name)
     {
-        return UpyunClient::getFileInfo( QUrl::toPercentEncoding(_cur_dir + "/" + file_name) );
+        return UpyunClient::getFileInfo( QUrl(_cur_dir + "/" + file_name).toEncoded() );
     }
 
 private:
