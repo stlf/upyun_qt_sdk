@@ -9,7 +9,10 @@ Sheet {
                 title: "Login"
                 onTriggered: {                    
                     if(_app.login(bucket.text,operator.text,pass.text))
-                    	loginsheet.close()
+                    {
+                        loginsheet.close()
+                        root.bucket = bucket.text
+                    }
                 }
 
             }

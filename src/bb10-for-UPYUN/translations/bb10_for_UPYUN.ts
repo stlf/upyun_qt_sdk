@@ -4,7 +4,7 @@
 <context>
     <name>main</name>
     <message>
-        <source>Please select the upload file:</source>
+        <source>Select the upload file:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

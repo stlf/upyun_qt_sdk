@@ -37,7 +37,7 @@ NavigationPane {
             ActionItem {
                 title: "Login out"
                 onTriggered: {
-                    login.open()
+                    	login.open()
                 }
             }
             
@@ -51,17 +51,30 @@ NavigationPane {
         model_data.clear()
         
         model_data.append(file_items)
+        
+        if(_app.pwd() === "/")
+            to_parent_dir.enabled = false 
+        else 
+        	to_parent_dir.enabled = true
     }
     
-    Page {
+    Page 
+    {
            
-        onCreationCompleted: {
-            
-        	login.open()
+        onCreationCompleted: {   
+        	   login.open()
         }
         
         titleBar: TitleBar {
             title: "Upyun Cloud"
+            acceptAction: ActionItem {
+                id: to_parent_dir
+                imageSource: "asset:///action_icons/ic_to_top.png"
+                onTriggered: {
+                    _app.gotoParentDir()
+                    listdir()
+                }
+            }
         }
         
         Container {
@@ -84,6 +97,16 @@ NavigationPane {
                 }
                 
                 accessibility.name: "TODO: Add property content"
+                
+                onTriggered: {
+                    var chosenItem = dataModel.data(indexPath); 
+                    if(chosenItem.size === "")
+                    {
+                    	_app.cd(chosenItem.name)
+                    	listdir()
+
+                    }
+                }
                 
                 listItemComponents: [
                     ListItemComponent {
@@ -152,6 +175,10 @@ NavigationPane {
 
     }
     attachedObjects: [
+        ComponentDefinition {
+            id: dir;
+            source: "main.qml"
+        },
         SystemToast {
             id: toast
         },
@@ -160,9 +187,8 @@ NavigationPane {
         },
         FilePicker {
             id: file_picker
-        
-            
-            title: qsTr ("Please select the upload file:")
+                    
+            title: qsTr ("Select the upload file:")
             
             onFileSelected: {
                 var selectf = selectedFiles[0]
@@ -195,7 +221,6 @@ NavigationPane {
                     }                        
                 }        	               
             }
-            inputField.defaultText: web.title
             title: "Make dir"
             body: "Input remote dir name: "
         },
@@ -204,10 +229,6 @@ NavigationPane {
             onClosed: {  
                 listdir()                                
             }
-        },
-        ComponentDefinition {
-            id: itemPageDefinition
-            source: "ItemPage.qml"
         }
     ]
     onPopTransitionEnded: {
