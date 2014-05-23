@@ -19,11 +19,13 @@ import bb.cascades.pickers 1.0
 import bb.system 1.0
 
 TabbedPane{
-    showTabsOnActionBar: false 
+    showTabsOnActionBar: false
     Tab {
-        
+        imageSource: "asset:///action_icons/ic_view_list.png"
+        title: "Browser"
+
         NavigationPane {
-            id: root
+            id: browser
             property string bucket
             property string operator
             property string pass
@@ -36,7 +38,7 @@ TabbedPane{
                         onTriggered: {
                             _app.signin()
                         }
-                    }           
+                    }
                     ,
                     ActionItem {
                         title: "Login out"
@@ -44,30 +46,30 @@ TabbedPane{
                             login.open()
                         }
                     }
-                
+
                 ]
             }
             
             function listdir()
             {
-                var file_items = _app.listDir() 
+                var file_items = _app.listDir()
                 
                 model_data.clear()
                 
                 model_data.append(file_items)
                 
                 if(_app.pwd() === "/")
-                    to_parent_dir.enabled = false 
-                else 
+                    to_parent_dir.enabled = false
+                else
                     to_parent_dir.enabled = true
                 
                 cur_dir.text = _app.pwd()
             }
             
-            Page 
+            Page
             {
                 
-                onCreationCompleted: {   
+                onCreationCompleted: {
                     login.open()
                 }
                 
@@ -78,7 +80,7 @@ TabbedPane{
                         imageSource: "asset:///action_icons/ic_to_top.png"
                         onTriggered: {
                             _app.gotoParentDir()
-                            root.listdir()
+                            browser.listdir()
                         }
                     }
                 }
@@ -100,25 +102,25 @@ TabbedPane{
                             dialog.exec()
                             
                             if (dialog.result === SystemUiResult.CancelButtonSelection)
-                                return false 
-                            return true  
+                                return false
+                            return true
                         }
                         
                         function removeDir(dir_name)
                         {
                             if(remove_comfirm(dir_name))
                                 _app.removeDir(dir_name)
-                            root.listdir()
+                            browser.listdir()
                         }
                         function removeFile(file_name)
                         {
                             if(remove_comfirm(file_name))
                                 _app.removeFile(file_name)
-                            root.listdir()
+                            browser.listdir()
                         }
                         function listdir()
                         {
-                            root.listdir()
+                            browser.listdir()
                         }
                         function save(name)
                         {
@@ -132,12 +134,12 @@ TabbedPane{
                         accessibility.name: "TODO: Add property content"
                         
                         onTriggered: {
-                            var chosenItem = dataModel.data(indexPath); 
+                            var chosenItem = dataModel.data(indexPath);
                             if(chosenItem.size === "")
                             {
                                 _app.cd(chosenItem.name)
-                                root.listdir()
-                            
+                                browser.listdir()
+
                             }
                         }
                         
@@ -147,30 +149,30 @@ TabbedPane{
                                     id: file_list_item
                                     accessibility.description: ""
                                     imageSource: ListItemData.type === "F" ?
-                                    "asset:///images/folder.png":"asset:///images/documents.png"
+                                                     "asset:///images/folder.png":"asset:///images/documents.png"
                                     title: ListItemData.name
                                     status: ListItemData.size
-                                    description: ListItemData.date 
+                                    description: ListItemData.date
                                     accessibility.name: "TODO: Add property content"
                                     
                                     contextActions: [
                                         ActionSet {
                                             title: ListItemData.name
-                                            actions: [ 
+                                            actions: [
                                                 ActionItem {
                                                     title: "Save"
                                                     onTriggered: {
                                                         file_list_item.ListItem.view.save(ListItemData.name)
                                                     }
                                                     imageSource: "asset:///action_icons/ic_save_as.png"
-                                                }, 
+                                                },
                                                 ActionItem {
                                                     title: "Remove"
                                                     onTriggered: {
                                                         
                                                         if(ListItemData.size === "")
                                                         {
-                                                            file_list_item.ListItem.view.removeDir(ListItemData.name)    
+                                                            file_list_item.ListItem.view.removeDir(ListItemData.name)
                                                         }
                                                         else
                                                         {
@@ -182,16 +184,16 @@ TabbedPane{
                                                     imageSource: "asset:///action_icons/ic_delete.png"
                                                 }
                                             ]
-                                        
+
                                         }
                                     ]
-                                
+
                                 }
-                            
+
                             }
                         ]
                     }
-                
+
                 }
                 
                 actions: [
@@ -200,7 +202,7 @@ TabbedPane{
                         ActionBar.placement: ActionBarPlacement.OnBar
                         onTriggered: {
                             file_picker.open()
-                        
+
                         }
                         imageSource: "asset:///action_icons/ic_add_entry.png"
                     },
@@ -209,7 +211,7 @@ TabbedPane{
                         ActionBar.placement: ActionBarPlacement.OnBar
                         onTriggered: {
                             add_folder_prompt.exec()
-                        
+
                         }
                         imageSource: "asset:///action_icons/ic_add_folder.png"
                     },
@@ -217,10 +219,10 @@ TabbedPane{
                         title: "Refresh"
                         ActionBar.placement: ActionBarPlacement.OnBar
                         onTriggered: {
-                            root.listdir()
+                            browser.listdir()
                         }
                         imageSource: "asset:///action_icons/ic_reload.png"
-                    
+
                     },
                     ActionItem {
                         title: "Login out"
@@ -228,12 +230,12 @@ TabbedPane{
                         onTriggered: {
                             login.open()
                         }
-                    
+
                     }
-                
-                
+
+
                 ]
-            
+
             }
             attachedObjects: [
                 ComponentDefinition {
@@ -258,24 +260,24 @@ TabbedPane{
                         if(mode === FilePickerMode.Saver)
                         {
                         }
-                        else 
+                        else
                         {
                             if(_app.uploadFile(selectf))
                             {
-                                toast.body = "Upload file succeed!"                    
+                                toast.body = "Upload file succeed!"
                                 toast.show()
                                 
-                                listdir()
+                                browser.listdir()
                             }
                         }
                     }
-                
+
                 },
                 SystemPrompt{
                     id: add_folder_prompt
                     
                     onFinished: {
-                        var dir_name = inputFieldTextEntry()	
+                        var dir_name = inputFieldTextEntry()
                         if (value === SystemUiResult.ConfirmButtonSelection)
                         {
                             if (_app.makeDir(dir_name)) {
@@ -283,37 +285,40 @@ TabbedPane{
                                 
                                 toast.show()
                                 
-                                root.listdir()
-                            
-                            }                        
-                        }        	               
-            }
-            title: "Make dir"
-            body: "Input remote dir name: "
-        },
-        Login {
-            id: login
-            onClosed: {  
-            	root.listdir()                                
+                                browser.listdir()
+
+                            }
+                        }
+                    }
+                    title: "Make dir"
+                    body: "Input remote dir name: "
+                },
+                Login {
+                    id: login
+                    onClosed: {
+                        browser.listdir()
+                    }
+                }
+            ]
+            onPopTransitionEnded: {
+                page.destroy();
             }
         }
-    ]
-    onPopTransitionEnded: {
-        page.destroy();
-    }
-}
-}
-Tab {
-    Page {
-        Container {
-            ImageView {
-                imageSource: "asset:///images/upyun_logo.jpg"
-            }
-            Label {
-                text: "App author: stlf(stlf@live.cn)"
-            }
         
+    }
+    Tab {
+        Page {
+            Container {
+                ImageView {
+                    imageSource: "asset:///images/upyun_logo.jpg"
+                }
+                Label {
+                    text: "App author: stlf(stlf@live.cn)"
+                }
+
+            }
         }
-    }    
-}
+        imageSource: "asset:///action_icons/ic_info.png"
+        title: "About"
+    }
 }
