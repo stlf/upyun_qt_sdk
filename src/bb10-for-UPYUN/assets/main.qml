@@ -38,8 +38,7 @@ TabbedPane{
                         onTriggered: {
                             _app.signin()
                         }
-                    }
-                    ,
+                    },
                     ActionItem {
                         title: "Login out"
                         onTriggered: {
@@ -126,7 +125,7 @@ TabbedPane{
                         {
                             if(_app.downloadFile(name))
                             {
-                                toast.body = "Down load file: " + name + " succeed!"
+                                toast.body = "Down load file: " + name + " succeed! \nYou can find it in downloads directory."
                                 toast.show()
                             }
                         }

@@ -32,11 +32,3 @@ FORMS    += widget.ui \
 
 RESOURCES += \
     res.qrc
-
-OTHER_FILES += \
-    bar-descriptor.xml \
-    bar-descriptor.xml \
-    bar-descriptor.xml \
-    android/AndroidManifest.xml
-
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

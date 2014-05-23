@@ -60,7 +60,7 @@ void UpyunClient::uploadFile(const QString &local_path, const QString &remote_pa
     {
         throw QString("can not open or read file:" + local_path);
     }
-
+    qDebug() << "=====>>>>>>>>" << remote_path;
     Q_D(UpyunClient);
     QNetworkReply* reply = d->uploadFile(file.readAll(), remote_path);
     if(!check_reply_code(waiting_reply(reply, this)))

@@ -112,6 +112,8 @@ public:
         }
     }
 
+    // =====>>>>>>>> "%2F%E6%B5%8B%E8%AF%95"
+    // =====>>>>>>>> "/%25E6%25B5%258B%25E8%25AF%2595"
     void uploadFile(const QString &local_path)
     {
         const QStringList &sl = local_path.split("/");
@@ -119,7 +121,12 @@ public:
         {
             QString fn = sl[sl.size() - 1];
             qDebug() << _cur_dir + "/" + fn;
-            UpyunClient::uploadFile(local_path, QUrl(_cur_dir + "/" + fn).toEncoded());
+
+            QString remote_path = (_cur_dir + "/" + fn);
+            UpyunClient::uploadFile(local_path, // QUrl(QUrl::fromEncoded(
+            		QUrl::toPercentEncoding(remote_path)
+            		//)).toEncoded()
+            		);
         }
         else
         {
